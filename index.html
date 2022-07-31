@@ -3,24 +3,24 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Document</title>
+  <title>More EV For Your Euro</title>
 </head>
 <body>
-  <h1>SuperVisualization</h1>
-  <p>Lorem ipsum</p>
-  <p>Lorem ipsum</p>
+  <h1>More EV For Your Euro</h1>
+  <p>This dataset comes from ev-database.org</p>
   <p>Lorem ipsum</p>
 </body>
-<div id="my_dataviz"></div>
+<div id="range_chart"></div>
 <script>
 
+// adapted from https://d3-graph-gallery.com/graph/scatter_basic.html
 // set the dimensions and margins of the graph
 const margin = {top: 10, right: 30, bottom: 30, left: 60},
-        width = 800 - margin.left - margin.right,
+        width = 1000 - margin.left - margin.right,
         height = 600 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
-const svg = d3.select("#my_dataviz")
+const svg = d3.select("#range_chart")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -32,7 +32,7 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
 
     // Add X axis
     const x = d3.scaleLinear()
-    .domain([0, 4000])
+    .domain([0, 300000])
     .range([ 0, width ]);
     svg.append("g")
     .attr("transform", `translate(0, ${height})`)
@@ -40,20 +40,63 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
 
     // Add Y axis
     const y = d3.scaleLinear()
-    .domain([0, 500000])
+    .domain([0, 800])
     .range([ height, 0]);
     svg.append("g")
     .call(d3.axisLeft(y));
 
+  // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
+  // Its opacity is set to 0: we don't see it by default.
+  var tooltip = d3.select("#range_chart")
+    .append("div")
+    .style("opacity", 0)
+    .attr("class", "tooltip")
+    .style("background-color", "white")
+    .style("border", "solid")
+    .style("border-width", "1px")
+    .style("border-radius", "5px")
+    .style("padding", "10px")
+
+
+  // A function that change this tooltip when the user hover a point.
+  // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
+  var mouseover = function(d) {
+    tooltip
+      .style("opacity", 1)
+  }
+
+  var mousemove = function(d) {
+    tooltip
+      .html(d.make + " " + d.model + "<br>Range (km): " + d.erange_real + "<br>Price (euros): " + d.price_de)
+      .style("left", (d3.mouse(this)[0]+90) + "px") // It is important to put the +90: other wise the tooltip is exactly where the point is an it creates a weird effect
+      .style("top", (d3.mouse(this)[1]) + "px")
+  }
+
+  // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
+  var mouseleave = function(d) {
+    tooltip
+      .transition()
+      .duration(200)
+      .style("opacity", 0)
+  }
+
     // Add dots
     svg.append('g')
     .selectAll("dot")
-    .data(data)
-    .join("circle")
-        .attr("cx", function (d) { return x(d.GrLivArea); } )
-        .attr("cy", function (d) { return y(d.SalePrice); } )
-        .attr("r", 1.5)
+    .data(data.filter(function(d,i) {return i<50}))
+    .enter()
+    .append("circle")
+        .attr("cx", function (d) { return x(d.price_de); } )
+        .attr("cy", function (d) { return y(d.erange_real); } )
+        .attr("r", 5)
         .style("fill", "#69b3a2")
+        .style("opacity", 0.3)
+        .style("stroke", "white")
+    .on("mouseover", mouseover )
+    .on("mousemove", mousemove )
+    .on("mouseleave", mouseleave )
+
+
 
 })
 </script>
