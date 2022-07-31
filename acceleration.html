@@ -1,7 +1,4 @@
 <html lang="en">
-<style>
-  font-family:verdana
-</style>
 <script src="https://d3js.org/d3.v6.js"></script>
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
 <head>
@@ -10,15 +7,15 @@
   <title>More EV For Your Euro</title>
 </head>
 <body>
-  <h1>More EV For Your Euro</h1>
-  <p>Electric vehicles (EVs) are increasing in popularity and constantly improving their specifications. <a href="https://ev-database.org/">EV-Database</a> lists the key metrics for all EVs currently available in Europe. We'd like to compare some of these performance metrics with price, to find out which EVs offer the best value for money.</p>
-  <p>In our first chart, we compare <b>vehicle range</b> in kilometers (on the y-axis) with <b>price</b> in Euros (as priced in Germany, on the x-axis). Using this visualization, we can see which vehicles offer the most range, and which offer more range for your Euro!</p>
-  <p>Hover over any of the datapoints to see the selected vehicle's details!</p>
+  <h1 style="font-family:verdana">More EV For Your Euro - The Quickest EVs</h1>
+  <p style="font-family:verdana">Here we can explore which vehicles have the fastest <b>acceleration</b> from 0 to 100 km/h (on the y-axis) compared with their <b>price</b> in Euros (as priced in Germany, on the x-axis). If we're looking for a vehicle with great quickness on the highway, we can see which ones come at the lowest cost. On this chart, lower numbers on the y-axis correspond with quicker vehicles!</p>
+  <p style="font-family:verdana">Hover over any of the datapoints to find out how quickly each EV can accelerate from 0 to 100 km/h!</p>
 </body>
-<div id="range_chart"></div>
+<div id="acceleration_chart"></div>
 <body style="font-family:verdana">
-  <p>Many electric vehicles have great acceleration, due to ...</p>
-  <a href="https://erikl2.github.io/CS416_Narrative_Visualization/acceleration.html">Next, click here to explore Acceleration vs. Price!</a>
+  <p>More EVs are offering quick-charging... </p>
+  <a href="https://erikl2.github.io/CS416_Narrative_Visualization/fastcharging.html">Next, click here to explore Fast-Charging Speed vs. Price!</a>
+  <p><a href="https://erikl2.github.io/CS416_Narrative_Visualization/index.html">Click here to return to the main page.</a></p>
 </body>
 <script>
 
@@ -29,7 +26,7 @@ const margin = {top: 10, right: 30, bottom: 30, left: 60},
         height = 600 - margin.top - margin.bottom;
 
 // append the svg object to the body of the page
-const svg = d3.select("#range_chart")
+const svg = d3.select("#acceleration_chart")
     .append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
@@ -49,14 +46,14 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
 
     // Add Y axis
     const y = d3.scaleLinear()
-    .domain([0, 800])
+    .domain([0, 15])
     .range([ height, 0]);
     svg.append("g")
     .call(d3.axisLeft(y));
 
     // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
     // Its opacity is set to 0: we don't see it by default.
-    var tooltip = d3.select("#range_chart")
+    var tooltip = d3.select("#acceleration_chart")
       .append("div")
       .style("opacity", 0)
       .attr("class", "tooltip")
@@ -77,7 +74,7 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
 
     var mousemove = function(event, d) {
       tooltip
-        .html("<b>" + d.make + " " + d.model + "</b><br>Range: " + d.erange_real + " km<br>Price: €" + d.price_de)
+        .html("<b>" + d.make + " " + d.model + "</b><br>Acceleration (0-100km/h): " + d.acceleration + " seconds<br>Price: €" + d.price_de)
         .style("left", (event.x)+10 + "px")
         .style("top", (event.y) + "px")
     }
@@ -93,13 +90,13 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
     // Add dots
     svg.append('g')
     .selectAll("dot")
-    // .data(data.filter(function(d,i) {return i<50}))  // REMOVE AND CLEAN THE DATA
+    .data(data.filter(function(d,i) {return i<50}))  // REMOVE AND CLEAN THE DATA
     .enter()
     .append("circle")
         .attr("cx", function (d) { return x(d.price_de); } )
-        .attr("cy", function (d) { return y(d.erange_real); } )
+        .attr("cy", function (d) { return y(d.acceleration); } )
         .attr("r", 5)
-        .style("fill", "#0000FF")
+        .style("fill", "#FFA500")
         .style("opacity", 0.5)
         .style("stroke", "white")
     .on("mouseover", mouseover )
@@ -110,33 +107,35 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
   const annotations = [
     {
       note: {
-        label: "The most expensive EV is the Lightyear 0 at 297,500 Euros",
-        title: "Most Expensive"
+        label: "The Kia EV6 GT goes 0-100 km/h in 3.5 seconds while costing around €70K",
+        title: "Quick for your Euro"
       },
-      type: d3.annotationCalloutCircle,
       subject: { radius: 10 },
-      x: 902,
-      y: 175,
-      dy: 30,
+      type: d3.annotationCalloutCircle,
+      x: 215,
+      y: 430,
+      dy: 15,
       dx: -30
     },
 
     {
       note: {
-        label: "The Lucid Air Dream Edition R has a range of 675km!",
-        title: "Longest Range"
+        label: "The Tesla Model S Plaid goes from 0-100 km/h in an incredible 2.1 seconds!",
+        title: "Quickest Overall"
       },
       type: d3.annotationCalloutCircle,
       subject: { radius: 10 },
-      x: 662,
-      y: 73,
-      dy: 30,
-      dx: -30
+      x: 455,
+      y: 483,
+      dy: -30,
+      dx: 15
     }
   ]
 
   const makeAnnotations = d3.annotation()
     .annotations(annotations)
+
+  // d3.select("#acceleration_chart")
   svg.append('g')
     .style("font-size", "12px")
     .call(makeAnnotations)
