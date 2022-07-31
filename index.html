@@ -28,7 +28,7 @@ const svg = d3.select("#my_dataviz")
     .attr("transform", `translate(${margin.left}, ${margin.top})`);
 
 //Read the data
-d3.csv("https://raw.githubusercontent.com/holtzy/data_to_viz/master/Example_dataset/2_TwoNum.csv").then( function(data) {
+d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/main/ev-database3.csv").then( function(data) {
 
     // Add X axis
     const x = d3.scaleLinear()
