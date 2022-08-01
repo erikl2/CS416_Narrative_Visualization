@@ -4,6 +4,8 @@
 </style>
 <script src="https://d3js.org/d3.v6.js"></script>
 <script src="https://rawgit.com/susielu/d3-annotation/master/d3-annotation.min.js"></script>
+<link rel="stylesheet" href="main.css">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -11,101 +13,88 @@
 </head>
 <body>
   <h1>More EV For Your Euro</h1>
-  <p>Electric vehicles (EVs) are increasing in popularity and constantly improving their specifications. <a href="https://ev-database.org/">EV-Database</a> lists the key metrics for all EVs currently available in Europe. We'd like to compare some of these performance metrics with price, to find out which EVs offer the best value for money.</p>
+  <p>Electric vehicles (EVs) are gaining in popularity and constantly improving their performance. <a href="https://ev-database.org/">EV-Database</a> lists the key metrics for all EVs currently available in Europe. We'd like to compare some of these performance metrics with price, to find out which EVs offer the best value for money.</p>
   <p>In our first chart, we compare <b>vehicle range</b> in kilometers (on the y-axis) with <b>price</b> in Euros (as priced in Germany, on the x-axis). Using this visualization, we can see which vehicles offer the most range, and which offer more range for your Euro!</p>
   <p>Hover over any of the datapoints to see the selected vehicle's details!</p>
 </body>
+
 <div id="range_chart"></div>
+
 <body style="font-family:verdana">
-  <p>Many electric vehicles have great acceleration, due to ...</p>
-  <a href="https://erikl2.github.io/CS416_Narrative_Visualization/acceleration.html">Next, click here to explore Acceleration vs. Price!</a>
+  <p>Click on one of the buttons below to continue exploring these key metrics to find the right EV at the right price for you!</p>
+
+<div>
+    <a href="index.html" class="range_button active">Range</a>
+    <a href="acceleration.html" class="accel_button">Acceleration</a>
+    <a href="fastcharging.html" class="fast_button">Fast-Charging</a>
+</div>
+
+<p>Data source: <a href="https://ev-database.org/">EV-Database</a></p>
+
 </body>
 <script>
 
-// adapted from https://d3-graph-gallery.com/graph/scatter_basic.html
-// set the dimensions and margins of the graph
-const margin = {top: 10, right: 30, bottom: 30, left: 60},
-        width = 1000 - margin.left - margin.right,
-        height = 600 - margin.top - margin.bottom;
-
-// append the svg object to the body of the page
 const svg = d3.select("#range_chart")
-    .append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", `translate(${margin.left}, ${margin.top})`);
+  .append("svg")
+  .attr("width", 1000)
+  .attr("height", 620)
+  .append("g")
+  .attr("transform", `translate(60, 30)`);
 
-//Read the data
+  var x_scale = d3.scaleLinear()
+  .domain([0, 300000])
+  .range([0, 910]);
+    
+  var x_axis = d3.axisBottom(x_scale);
+
+  svg.append("g")
+  .attr("transform", `translate(0, 560)`)
+  .call(x_axis);
+
+  const y_scale = d3.scaleLinear()
+  .domain([0, 800])
+  .range([560, 0]);
+
+  var y_axis = d3.axisLeft(y_scale)
+
+  svg.append("g")
+  .call(y_axis);
+
 d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/main/ev-database3.csv").then( function(data) {
 
-    // Add X axis
-    const x = d3.scaleLinear()
-    .domain([0, 300000])
-    .range([ 0, width ]);
-    svg.append("g")
-    .attr("transform", `translate(0, ${height})`)
-    .call(d3.axisBottom(x));
+  var tooltip = d3.select("#range_chart").append("div")
+    .attr("class", "tooltip")
 
-    // Add Y axis
-    const y = d3.scaleLinear()
-    .domain([0, 800])
-    .range([ height, 0]);
-    svg.append("g")
-    .call(d3.axisLeft(y));
+  svg.append("g")
+  .selectAll("dot")
+  .data(data)
+  .enter()
+  .append("circle")
+      .attr("cx", function (d) { return x_scale(d.price_de); } )
+      .attr("cy", function (d) { return y_scale(d.erange_real); } )
+      .attr("r", 5)
+      .style("fill", "#0000FF")
+      .style("opacity", 0.5)
 
-    // Add a tooltip div. Here I define the general feature of the tooltip: stuff that do not depend on the data point.
-    // Its opacity is set to 0: we don't see it by default.
-    var tooltip = d3.select("#range_chart")
-      .append("div")
+  .on("mouseover", function(event, d) {
+    tooltip
+      .style("opacity", 1)
+  })
+
+  .on("mousemove", function(event, d) {
+    tooltip
+      .html("<b>" + d.make + " " + d.model + "</b><br>Range: " + d.erange_real + " km<br>Price: €" + d.price_de)
+      .style("left", (event.pageX)+10 + "px")
+      .style("top", (event.pageY) + "px")
+
+  })
+
+  .on("mouseleave", function(d) {
+    tooltip
+      .transition()
+      .duration(200)
       .style("opacity", 0)
-      .attr("class", "tooltip")
-      .style("background-color", "white")
-      .style("border", "solid")
-      .style("border-width", "1px")
-      .style("border-radius", "5px")
-      .style("padding", "10px")
-      .style("position", "fixed")
-
-
-    // A function that change this tooltip when the user hover a point.
-    // Its opacity is set to 1: we can now see it. Plus it set the text and position of tooltip depending on the datapoint (d)
-    var mouseover = function(event, d) {
-      tooltip
-        .style("opacity", 1)
-    }
-
-    var mousemove = function(event, d) {
-      tooltip
-        .html("<b>" + d.make + " " + d.model + "</b><br>Range: " + d.erange_real + " km<br>Price: €" + d.price_de)
-        .style("left", (event.x)+10 + "px")
-        .style("top", (event.y) + "px")
-    }
-
-    // A function that change this tooltip when the leaves a point: just need to set opacity to 0 again
-    var mouseleave = function(d) {
-      tooltip
-        .transition()
-        .duration(200)
-        .style("opacity", 0)
-    }
-
-    // Add dots
-    svg.append('g')
-    .selectAll("dot")
-    // .data(data.filter(function(d,i) {return i<50}))  // REMOVE AND CLEAN THE DATA
-    .enter()
-    .append("circle")
-        .attr("cx", function (d) { return x(d.price_de); } )
-        .attr("cy", function (d) { return y(d.erange_real); } )
-        .attr("r", 5)
-        .style("fill", "#0000FF")
-        .style("opacity", 0.5)
-        .style("stroke", "white")
-    .on("mouseover", mouseover )
-    .on("mousemove", mousemove )
-    .on("mouseleave", mouseleave )
-
+  })
 
   const annotations = [
     {
@@ -137,7 +126,7 @@ d3.csv("https://raw.githubusercontent.com/erikl2/CS416_Narrative_Visualization/m
 
   const makeAnnotations = d3.annotation()
     .annotations(annotations)
-  svg.append('g')
+  svg.append("g")
     .style("font-size", "12px")
     .call(makeAnnotations)
 

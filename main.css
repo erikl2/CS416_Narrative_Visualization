@@ -1,0 +1,76 @@
+.range_button {
+  color: #000000;
+  background-color: #FFFFFF;
+  border: 2px solid #0000FF;
+  border-radius: 12px;
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.range_button:hover {
+    color: #FFFFFF;
+    background-color: #0000FF
+}
+
+.range_button:active {
+  color: #FFFFFF;
+  background-color: #0000FF;
+}
+
+.accel_button {
+  color: #000000;
+  background-color: #FFFFFF;
+  border: 2px solid #FFA500;
+  border-radius: 12px;
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.accel_button:hover {background-color: #FFA500}
+
+.accel_button:active {
+  background-color: #FFA500;
+}
+
+.fast_button {
+  color: #000000;
+  background-color: #FFFFFF;
+  border: 2px solid #008000;
+  border-radius: 12px;
+  display: inline-block;
+  padding: 15px 25px;
+  font-size: 16px;
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+}
+
+.fast_button:hover {
+    color: #FFFFFF;
+    background-color: #008000}
+}
+
+.fast_button:active {
+  color: #FFFFFF;
+  background-color: #0000FF;
+}
+
+div.tooltip { 
+    position: fixed;     
+    text-align: center;     
+    padding: 10px;       
+    font: 10px;    
+    background-color: white; 
+    border: solid;  
+    border-width: 1px;   
+    border-radius: 2px;     
+    pointer-events: none;     
+}
